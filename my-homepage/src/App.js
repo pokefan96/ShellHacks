@@ -1,5 +1,5 @@
 import './App.css';
-import myPhoto from './assets/images/my-photo.jpg';  // Adjust the path as needed
+import img from './images/IMG_8757.jpg'; // Adjust the path as needed
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
       {/* Photo in the middle */}
       <section className="App-photo">
         <img 
-          src={myPhoto}  // Using the imported image
+          src={img}  // Use 'img' since that's the imported variable
           alt="Homepage Main" 
           className="main-photo" 
         />
