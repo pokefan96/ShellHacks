@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import './App.css';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { app } from './firebase'; // Import Firebase app
-import img from './images/IMG_8757.jpg'; // Adjust the path as needed
+import { app } from './firebase'; // Correct import for Firebase app
+import img from './images/IMG_8757.jpg';
+import UserDetails from './UserDetails';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+
 
 function App() {
   const [username, setUsername] = useState('');
@@ -18,12 +21,10 @@ function App() {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, username, password)
       .then((userCredential) => {
-        // Signed up successfully
         setIsLoggedIn(true);
         setError('');
       })
       .catch((error) => {
-        // Handle signup errors
         setError(error.message);
       });
   };
@@ -33,12 +34,10 @@ function App() {
     e.preventDefault();
     signInWithEmailAndPassword(auth, username, password)
       .then((userCredential) => {
-        // Signed in successfully
         setIsLoggedIn(true);
         setError('');
       })
       .catch((error) => {
-        // Handle login errors
         setError(error.message);
       });
   };
@@ -47,7 +46,6 @@ function App() {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        // Sign-out successful
         setIsLoggedIn(false);
         setUsername('');
         setPassword('');
@@ -58,73 +56,85 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {/* Tab bar at the top */}
-      <header className="App-header">
-        <nav className="App-nav">
-          <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </nav>
-      </header>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <nav className="App-nav">
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+        </header>
 
-      {/* Photo in the middle */}
-      <section className="App-photo">
-        <img 
-          src={img}  // Use 'img' since that's the imported variable
-          alt="Homepage Main" 
-          className="main-photo" 
-        />
-      </section>
-
-      {/* Conditional rendering based on login status */}
-      {!isLoggedIn ? (
-        <section className="App-login">
-          <h2>{isSignUp ? 'Sign Up' : 'Login'}</h2>
-          <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
-            <div>
-              <label>Email:</label>
-              <input
-                type="email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Password:</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error && <p className="error-message">{error}</p>}
-            <button type="submit">{isSignUp ? 'Sign Up' : 'Login'}</button>
-          </form>
-          <button onClick={() => setIsSignUp(!isSignUp)}>
-            {isSignUp ? 'Already have an account? Login' : 'New user? Sign Up'}
-          </button>
+        <section className="App-photo">
+          <img src={img} alt="Homepage Main" className="main-photo" />
         </section>
-      ) : (
-        <div>
-          <h2>Welcome, {username}!</h2>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      )}
 
-      {/* References at the bottom */}
-      <footer className="App-footer">
-        <h2>References</h2>
-        <ul>
-          <li><a href="https://example.com">Reference 1</a></li>
-          <li><a href="https://example.com">Reference 2</a></li>
-          <li><a href="https://example.com">Reference 3</a></li>
-        </ul>
-      </footer>
-    </div>
+        <Routes>
+          {/* If the user is logged in, redirect them to the user details page */}
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Navigate to="/user-details" />
+              ) : (
+                <section className="App-login">
+                  <h2>{isSignUp ? 'Sign Up' : 'Login'}</h2>
+                  <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+                    <div>
+                      <label>Email:</label>
+                      <input
+                        type="email"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label>Password:</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                    {error && <p className="error-message">{error}</p>}
+                    <button type="submit">{isSignUp ? 'Sign Up' : 'Login'}</button>
+                  </form>
+                  <button onClick={() => setIsSignUp(!isSignUp)}>
+                    {isSignUp ? 'Already have an account? Login' : 'New user? Sign Up'}
+                  </button>
+                </section>
+              )
+            }
+          />
+
+          {/* User Details Route */}
+          <Route
+            path="/user-details"
+            element={isLoggedIn ? <UserDetails /> : <Navigate to="/" />}
+          />
+        </Routes>
+
+        {isLoggedIn && (
+          <div>
+            <h2>Welcome, {username}!</h2>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
+
+        <footer className="App-footer">
+          <h2>References</h2>
+          <ul>
+            <li><a href="https://example.com">Reference 1</a></li>
+            <li><a href="https://example.com">Reference 2</a></li>
+            <li><a href="https://example.com">Reference 3</a></li>
+          </ul>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
