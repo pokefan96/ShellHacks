@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import './App.css';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { app } from './firebase'; // Correct import for Firebase app
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { app, googleProvider } from './firebase'; // Import the googleProvider
 import img from './images/IMG_8757.jpg';
 import UserDetails from './UserDetails';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-
 
 function App() {
   const [username, setUsername] = useState('');
@@ -16,11 +16,25 @@ function App() {
 
   const auth = getAuth(app);
 
-  // Handle Signup
+  // Handle Google Sign-In
+  const signInWithGoogle = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        setIsLoggedIn(true);
+        setError('');
+        const user = result.user;
+        setUsername(user.displayName || user.email); // Set the username to user's display name or email
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+  // Handle Signup (Email/Password)
   const handleSignUp = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, username, password)
-      .then((userCredential) => {
+      .then(() => {
         setIsLoggedIn(true);
         setError('');
       })
@@ -29,11 +43,11 @@ function App() {
       });
   };
 
-  // Handle Login
+  // Handle Login (Email/Password)
   const handleLogin = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, username, password)
-      .then((userCredential) => {
+      .then(() => {
         setIsLoggedIn(true);
         setError('');
       })
@@ -74,7 +88,6 @@ function App() {
         </section>
 
         <Routes>
-          {/* If the user is logged in, redirect them to the user details page */}
           <Route
             path="/"
             element={
@@ -106,16 +119,12 @@ function App() {
                   <button onClick={() => setIsSignUp(!isSignUp)}>
                     {isSignUp ? 'Already have an account? Login' : 'New user? Sign Up'}
                   </button>
+                  <button onClick={signInWithGoogle}>Sign In with Google</button>
                 </section>
               )
             }
           />
-
-          {/* User Details Route */}
-          <Route
-            path="/user-details"
-            element={isLoggedIn ? <UserDetails /> : <Navigate to="/" />}
-          />
+          <Route path="/user-details" element={isLoggedIn ? <UserDetails /> : <Navigate to="/" />} />
         </Routes>
 
         {isLoggedIn && (
