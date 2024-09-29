@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS
 
 # Use the absolute path or correct relative path to CSV
-csv_file_path = '/Users/aaronsteig/Documents/Documents - Aaron’s MacBook Air (2)/FALL 2023/personal/hackathon/ShellHacks/my-homepage/src/cleaned_credit_cards.csv'
+csv_file_path = 'ShellHacks/my-homepage/src/cleaned_credit_cards.csv'
 
 # Load the CSV file
 df = pd.read_csv(csv_file_path)
