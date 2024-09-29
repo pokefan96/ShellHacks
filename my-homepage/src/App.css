@@ -63,3 +63,44 @@
 .App-footer ul li a:hover {
   text-decoration: underline;
 }
+
+
+.App-nav ul {
+  display: flex;
+  list-style: none;
+  justify-content: space-around;
+  padding: 0;
+  background-color: #333;
+}
+
+.App-nav ul li a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
+}
+
+.App-nav ul li a:hover {
+  background-color: #555;
+}
+
+
+.App-login {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.App-login input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: red;
+}
