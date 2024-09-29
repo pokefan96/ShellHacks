@@ -22,8 +22,7 @@ def filter_credit_cards(df, user_credit_score, user_income):
 
 def main():
     # Load the CSV file
-    csv_file_path = '/Users/aaronsteig/Documents/Documents - Aaron’s MacBook Air (2)/FALL 2023/personal/hackathon/ShellHacks/my-homepage/src/cleaned_credit_cards.csv'
-
+    csv_file_path = 'ShellHacks/my-homepage/src/cleaned_credit_cards.csv'
     df = load_credit_cards(csv_file_path)
     
     # Example user inputs
