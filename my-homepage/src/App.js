@@ -110,14 +110,6 @@ function App() {
         </section>
       ) : (
         <div>
-          {/* Photo in the middle */}
-          <section className="App-photo">
-            <img 
-              src={img}  // Use 'img' since that's the imported variable
-              alt="Homepage Main" 
-              className="main-photo" 
-            />
-          </section>
           <h2>Welcome, {username}!</h2>
           <button onClick={handleLogout}>Logout</button>
         </div>
