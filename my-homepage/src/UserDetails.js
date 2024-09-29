@@ -1,41 +1,46 @@
-// src/components/UserDetails.js
 import React, { useState } from 'react';
-import { auth, db } from './firebase'; // Import auth and Firestore database
-import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
 
 const UserDetails = () => {
   const [creditScore, setCreditScore] = useState('');
   const [yearlyIncome, setYearlyIncome] = useState('');
+  const [topCreditCards, setTopCreditCards] = useState([]);
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = auth.currentUser; // Make sure to use the imported `auth`
 
-    if (user) {
-      // Create a reference to the user's document in Firestore
-      const userDocRef = doc(db, 'users', user.uid);
+    // Prepare data to send to Flask backend
+    const data = {
+      creditScore: creditScore,
+      yearlyIncome: yearlyIncome
+    };
 
-      try {
-        // Log the data before sending it to Firestore
-        console.log("Saving data: ", { creditScore, yearlyIncome });
+    try {
+      const response = await fetch('http://127.0.0.1:5000/filter_cards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-        // Store the user's credit score and yearly income in Firestore
-        await setDoc(userDocRef, {
-          creditScore: parseInt(creditScore),
-          yearlyIncome: parseFloat(yearlyIncome)
-        }, { merge: true }); // merge: true ensures it only updates fields and doesn't overwrite the document
-
-        setMessage('Data saved successfully!');
-        console.log("Data saved successfully!");
-      } catch (error) {
-        setMessage(`Error saving data: ${error.message}`);
-        console.error("Error saving data: ", error);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.length === 0) {
+          setMessage('No credit cards fit your criteria.');
+        } else {
+          setTopCreditCards(result);
+          setMessage('Here are the top credit cards for you:');
+        }
+      } else {
+        setMessage('Error fetching credit cards.');
       }
-    } else {
-      setMessage('No user is signed in.');
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('Error connecting to server.');
     }
-  };
+};
+
 
   return (
     <div>
@@ -63,7 +68,18 @@ const UserDetails = () => {
         </div>
         <button type="submit">Submit</button>
       </form>
+
       {message && <p>{message}</p>}
+
+      {topCreditCards.length > 0 && (
+        <ul>
+          {topCreditCards.map((card, index) => (
+            <li key={index}>
+              {card['Credit Card']} - FICO Score: {card['Required FICO Score']} - Income Requirement: ${card['Estimated Minimum Income']}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
